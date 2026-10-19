@@ -1,0 +1,21 @@
+[tools]
+java = "temurin-17.0.20+101"
+
+[settings]
+lockfile = true
+minimum_release_age = "7d"
+
+[tool_config]
+locked = true
+
+[tasks.test]
+description = "Run tests available on the current host"
+run = "./gradlew allTests"
+
+[tasks.check]
+description = "Run static analysis, tests, and local publication verification"
+run = [
+    "./gradlew detekt",
+    "./gradlew allTests",
+    "./gradlew publishToMavenLocal",
+]
