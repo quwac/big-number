@@ -1,34 +1,34 @@
 <!-- markdownlint-disable MD041 -->
 
-## Summary
+## 📝 Summary
 
 <!-- Describe the resulting behavior and its impact. -->
 
-## Related issue
+## 🔗 Related issue
 
 <!-- Link the issue this pull request addresses. Write "Not needed." if no issue applies. -->
 
-## Changes
+## 🔨 Changes
 
 <!-- List the focused changes that reviewers should examine. -->
 
 -
 
-## Verification
+## 🧪 Verification
 
 <!-- List only checks that you ran and that passed. Write "Not needed." only when verification does not apply. -->
 
 -
 
-## Compatibility and API impact
+## 📦 Compatibility and API impact
 
 <!-- Describe compatibility, public API changes, and any required migration. Write "Not needed." if this does not apply. -->
 
-## AI assistance
+## 🤖 AI assistance
 
 <!-- State whether AI tools assisted with this pull request and what they helped with. Write "Not used." if no AI tools were used. -->
 
-## Checklist
+## ✅ Checklist
 
 - [ ] I have read `CONTRIBUTING.md`.
 - [ ] I added or updated tests for changed behavior, or explained why tests are not needed.
