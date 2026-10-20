@@ -6,6 +6,8 @@ package dev.quwac.bignumber
  * A [precision] of zero means unlimited precision. A positive precision limits a result to that
  * many significant decimal digits.
  *
+ * @property precision The maximum number of significant digits, or zero for unlimited precision.
+ * @property roundingMode The rule used when a result must discard digits.
  * @throws IllegalArgumentException when [precision] is negative.
  */
 data class MathContext(val precision: Int, val roundingMode: RoundingMode = RoundingMode.HALF_UP) {
@@ -13,6 +15,7 @@ data class MathContext(val precision: Int, val roundingMode: RoundingMode = Roun
         require(precision >= 0) { "Precision must be non-negative" }
     }
 
+    /** Provides standard decimal arithmetic contexts. */
     companion object {
         /** Unlimited precision; operations that require rounding fail. */
         val UNLIMITED: MathContext = MathContext(0, RoundingMode.HALF_UP)
