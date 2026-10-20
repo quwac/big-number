@@ -70,6 +70,42 @@ class BigNumberJavaOracleTest {
     }
 
     @Test
+    fun bitOperationsMatchJavaBigInteger() {
+        val random = Random(20261022)
+        val shifts = listOf(-129, -65, -1, 0, 1, 7, 64, 129)
+        val bitIndexes = listOf(0, 1, 7, 31, 63, 95)
+
+        repeat(100) {
+            val leftValue = random.nextLong()
+            val rightValue = random.nextLong()
+            val left = BigInteger.of(leftValue)
+            val right = BigInteger.of(rightValue)
+            val javaLeft = JavaBigInteger.valueOf(leftValue)
+            val javaRight = JavaBigInteger.valueOf(rightValue)
+
+            assertEquals(javaLeft.and(javaRight).toString(), (left and right).toString())
+            assertEquals(javaLeft.or(javaRight).toString(), (left or right).toString())
+            assertEquals(javaLeft.xor(javaRight).toString(), (left xor right).toString())
+            assertEquals(javaLeft.andNot(javaRight).toString(), (left andNot right).toString())
+            assertEquals(javaLeft.not().toString(), left.inv().toString())
+            assertEquals(javaLeft.bitLength(), left.bitLength())
+            assertEquals(javaLeft.bitCount(), left.bitCount())
+            assertEquals(javaLeft.lowestSetBit, left.lowestSetBit())
+
+            for (shift in shifts) {
+                assertEquals(javaLeft.shiftLeft(shift).toString(), left.shiftLeft(shift).toString())
+                assertEquals(javaLeft.shiftRight(shift).toString(), left.shiftRight(shift).toString())
+            }
+            for (index in bitIndexes) {
+                assertEquals(javaLeft.testBit(index), left.testBit(index))
+                assertEquals(javaLeft.setBit(index).toString(), left.setBit(index).toString())
+                assertEquals(javaLeft.clearBit(index).toString(), left.clearBit(index).toString())
+                assertEquals(javaLeft.flipBit(index).toString(), left.flipBit(index).toString())
+            }
+        }
+    }
+
+    @Test
     fun decimalRepresentationAndArithmeticMatchJavaBigDecimal() {
         val values = listOf("0", "0.00", "1", "1.0", "1.00", "-12.30", "1E+3", "1E-7", "1234567890.012300")
         for (text in values) assertDecimalMatches(JavaBigDecimal(text), BigDecimal(text))

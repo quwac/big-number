@@ -79,6 +79,18 @@ familiar from `java.math.BigInteger`. Exact variants such as `toIntExact()` and 
 and ordered comparison with `BigInteger` in either operand order. `Float` and `Double` provide the same operators with
 `BigInteger`, returning `BigDecimal` so fractional results are preserved.
 
+Bitwise operations use an infinite-width two's-complement representation, so `-1` has `1` in every bit position rather
+than a finite representation such as `11`. `and`, `or`, `xor`, `andNot`, `inv`, `shl`, and `shr` therefore work
+consistently for positive and negative values. The binary operations accept `BigInteger` or any concrete integral type
+in either operand order. Individual bits can be read or changed with `testBit`, `setBit`, `clearBit`, and `flipBit`.
+There is no unsigned right shift because an arbitrary-precision integer has no fixed most-significant bit.
+
+```kotlin
+val masked = BigInteger.of(-1) and BigInteger.of(5) // 5
+val inverted = BigInteger.of(5).inv() // -6
+val shifted = BigInteger.of(-5) shr 1 // -3
+```
+
 String parsing accepts an optional sign. `BigInteger` supports radices from 2 through 36. Invalid text throws
 `IllegalArgumentException`; nullable parsing functions return `null`. Division by zero and non-terminating exact decimal
 division throw `ArithmeticException`.

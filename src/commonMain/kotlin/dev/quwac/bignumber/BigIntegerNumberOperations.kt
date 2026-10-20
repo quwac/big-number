@@ -15,6 +15,14 @@ operator fun Byte.rem(other: BigInteger): BigInteger = toBigInteger() % other
 operator fun BigInteger.rem(other: Byte): BigInteger = this % other.toBigInteger()
 operator fun Byte.compareTo(other: BigInteger): Int = toBigInteger().compareTo(other)
 operator fun BigInteger.compareTo(other: Byte): Int = compareTo(other.toBigInteger())
+infix fun Byte.and(other: BigInteger): BigInteger = toBigInteger() and other
+infix fun BigInteger.and(other: Byte): BigInteger = this and other.toBigInteger()
+infix fun Byte.or(other: BigInteger): BigInteger = toBigInteger() or other
+infix fun BigInteger.or(other: Byte): BigInteger = this or other.toBigInteger()
+infix fun Byte.xor(other: BigInteger): BigInteger = toBigInteger() xor other
+infix fun BigInteger.xor(other: Byte): BigInteger = this xor other.toBigInteger()
+infix fun Byte.andNot(other: BigInteger): BigInteger = toBigInteger() andNot other
+infix fun BigInteger.andNot(other: Byte): BigInteger = this andNot other.toBigInteger()
 
 // Short
 operator fun Short.plus(other: BigInteger): BigInteger = toBigInteger() + other
@@ -29,6 +37,14 @@ operator fun Short.rem(other: BigInteger): BigInteger = toBigInteger() % other
 operator fun BigInteger.rem(other: Short): BigInteger = this % other.toBigInteger()
 operator fun Short.compareTo(other: BigInteger): Int = toBigInteger().compareTo(other)
 operator fun BigInteger.compareTo(other: Short): Int = compareTo(other.toBigInteger())
+infix fun Short.and(other: BigInteger): BigInteger = toBigInteger() and other
+infix fun BigInteger.and(other: Short): BigInteger = this and other.toBigInteger()
+infix fun Short.or(other: BigInteger): BigInteger = toBigInteger() or other
+infix fun BigInteger.or(other: Short): BigInteger = this or other.toBigInteger()
+infix fun Short.xor(other: BigInteger): BigInteger = toBigInteger() xor other
+infix fun BigInteger.xor(other: Short): BigInteger = this xor other.toBigInteger()
+infix fun Short.andNot(other: BigInteger): BigInteger = toBigInteger() andNot other
+infix fun BigInteger.andNot(other: Short): BigInteger = this andNot other.toBigInteger()
 
 // Int
 operator fun Int.plus(other: BigInteger): BigInteger = toBigInteger() + other
@@ -43,6 +59,14 @@ operator fun Int.rem(other: BigInteger): BigInteger = toBigInteger() % other
 operator fun BigInteger.rem(other: Int): BigInteger = this % other.toBigInteger()
 operator fun Int.compareTo(other: BigInteger): Int = toBigInteger().compareTo(other)
 operator fun BigInteger.compareTo(other: Int): Int = compareTo(other.toBigInteger())
+infix fun Int.and(other: BigInteger): BigInteger = toBigInteger() and other
+infix fun BigInteger.and(other: Int): BigInteger = this and other.toBigInteger()
+infix fun Int.or(other: BigInteger): BigInteger = toBigInteger() or other
+infix fun BigInteger.or(other: Int): BigInteger = this or other.toBigInteger()
+infix fun Int.xor(other: BigInteger): BigInteger = toBigInteger() xor other
+infix fun BigInteger.xor(other: Int): BigInteger = this xor other.toBigInteger()
+infix fun Int.andNot(other: BigInteger): BigInteger = toBigInteger() andNot other
+infix fun BigInteger.andNot(other: Int): BigInteger = this andNot other.toBigInteger()
 
 // Long
 operator fun Long.plus(other: BigInteger): BigInteger = toBigInteger() + other
@@ -57,6 +81,14 @@ operator fun Long.rem(other: BigInteger): BigInteger = toBigInteger() % other
 operator fun BigInteger.rem(other: Long): BigInteger = this % other.toBigInteger()
 operator fun Long.compareTo(other: BigInteger): Int = toBigInteger().compareTo(other)
 operator fun BigInteger.compareTo(other: Long): Int = compareTo(other.toBigInteger())
+infix fun Long.and(other: BigInteger): BigInteger = toBigInteger() and other
+infix fun BigInteger.and(other: Long): BigInteger = this and other.toBigInteger()
+infix fun Long.or(other: BigInteger): BigInteger = toBigInteger() or other
+infix fun BigInteger.or(other: Long): BigInteger = this or other.toBigInteger()
+infix fun Long.xor(other: BigInteger): BigInteger = toBigInteger() xor other
+infix fun BigInteger.xor(other: Long): BigInteger = this xor other.toBigInteger()
+infix fun Long.andNot(other: BigInteger): BigInteger = toBigInteger() andNot other
+infix fun BigInteger.andNot(other: Long): BigInteger = this andNot other.toBigInteger()
 
 // UByte
 operator fun UByte.plus(other: BigInteger): BigInteger = toBigInteger() + other
@@ -71,6 +103,14 @@ operator fun UByte.rem(other: BigInteger): BigInteger = toBigInteger() % other
 operator fun BigInteger.rem(other: UByte): BigInteger = this % other.toBigInteger()
 operator fun UByte.compareTo(other: BigInteger): Int = toBigInteger().compareTo(other)
 operator fun BigInteger.compareTo(other: UByte): Int = compareTo(other.toBigInteger())
+infix fun UByte.and(other: BigInteger): BigInteger = toBigInteger() and other
+infix fun BigInteger.and(other: UByte): BigInteger = this and other.toBigInteger()
+infix fun UByte.or(other: BigInteger): BigInteger = toBigInteger() or other
+infix fun BigInteger.or(other: UByte): BigInteger = this or other.toBigInteger()
+infix fun UByte.xor(other: BigInteger): BigInteger = toBigInteger() xor other
+infix fun BigInteger.xor(other: UByte): BigInteger = this xor other.toBigInteger()
+infix fun UByte.andNot(other: BigInteger): BigInteger = toBigInteger() andNot other
+infix fun BigInteger.andNot(other: UByte): BigInteger = this andNot other.toBigInteger()
 
 // UShort
 operator fun UShort.plus(other: BigInteger): BigInteger = toBigInteger() + other
@@ -85,6 +125,14 @@ operator fun UShort.rem(other: BigInteger): BigInteger = toBigInteger() % other
 operator fun BigInteger.rem(other: UShort): BigInteger = this % other.toBigInteger()
 operator fun UShort.compareTo(other: BigInteger): Int = toBigInteger().compareTo(other)
 operator fun BigInteger.compareTo(other: UShort): Int = compareTo(other.toBigInteger())
+infix fun UShort.and(other: BigInteger): BigInteger = toBigInteger() and other
+infix fun BigInteger.and(other: UShort): BigInteger = this and other.toBigInteger()
+infix fun UShort.or(other: BigInteger): BigInteger = toBigInteger() or other
+infix fun BigInteger.or(other: UShort): BigInteger = this or other.toBigInteger()
+infix fun UShort.xor(other: BigInteger): BigInteger = toBigInteger() xor other
+infix fun BigInteger.xor(other: UShort): BigInteger = this xor other.toBigInteger()
+infix fun UShort.andNot(other: BigInteger): BigInteger = toBigInteger() andNot other
+infix fun BigInteger.andNot(other: UShort): BigInteger = this andNot other.toBigInteger()
 
 // UInt
 operator fun UInt.plus(other: BigInteger): BigInteger = toBigInteger() + other
@@ -99,6 +147,14 @@ operator fun UInt.rem(other: BigInteger): BigInteger = toBigInteger() % other
 operator fun BigInteger.rem(other: UInt): BigInteger = this % other.toBigInteger()
 operator fun UInt.compareTo(other: BigInteger): Int = toBigInteger().compareTo(other)
 operator fun BigInteger.compareTo(other: UInt): Int = compareTo(other.toBigInteger())
+infix fun UInt.and(other: BigInteger): BigInteger = toBigInteger() and other
+infix fun BigInteger.and(other: UInt): BigInteger = this and other.toBigInteger()
+infix fun UInt.or(other: BigInteger): BigInteger = toBigInteger() or other
+infix fun BigInteger.or(other: UInt): BigInteger = this or other.toBigInteger()
+infix fun UInt.xor(other: BigInteger): BigInteger = toBigInteger() xor other
+infix fun BigInteger.xor(other: UInt): BigInteger = this xor other.toBigInteger()
+infix fun UInt.andNot(other: BigInteger): BigInteger = toBigInteger() andNot other
+infix fun BigInteger.andNot(other: UInt): BigInteger = this andNot other.toBigInteger()
 
 // ULong
 operator fun ULong.plus(other: BigInteger): BigInteger = toBigInteger() + other
@@ -113,6 +169,14 @@ operator fun ULong.rem(other: BigInteger): BigInteger = toBigInteger() % other
 operator fun BigInteger.rem(other: ULong): BigInteger = this % other.toBigInteger()
 operator fun ULong.compareTo(other: BigInteger): Int = toBigInteger().compareTo(other)
 operator fun BigInteger.compareTo(other: ULong): Int = compareTo(other.toBigInteger())
+infix fun ULong.and(other: BigInteger): BigInteger = toBigInteger() and other
+infix fun BigInteger.and(other: ULong): BigInteger = this and other.toBigInteger()
+infix fun ULong.or(other: BigInteger): BigInteger = toBigInteger() or other
+infix fun BigInteger.or(other: ULong): BigInteger = this or other.toBigInteger()
+infix fun ULong.xor(other: BigInteger): BigInteger = toBigInteger() xor other
+infix fun BigInteger.xor(other: ULong): BigInteger = this xor other.toBigInteger()
+infix fun ULong.andNot(other: BigInteger): BigInteger = toBigInteger() andNot other
+infix fun BigInteger.andNot(other: ULong): BigInteger = this andNot other.toBigInteger()
 
 // Float
 operator fun Float.plus(other: BigInteger): BigDecimal = toBigDecimal() + BigDecimal(other)
