@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">BigNumber project icon</title>
+  <defs>
+    <linearGradient id="brand-gradient" x1="8" y1="120" x2="118" y2="8" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00b8ff"/>
+      <stop offset="0.28" stop-color="#1264ff"/>
+      <stop offset="0.52" stop-color="#7828ff"/>
+      <stop offset="0.74" stop-color="#f313d6"/>
+      <stop offset="1" stop-color="#ff9b18"/>
+    </linearGradient>
+  </defs>
+  <path
+    fill="url(#brand-gradient)"
+    fill-rule="evenodd"
+    d="M10 8h57c25 0 40 12 40 33 0 12-6 22-17 28 13 5 21 15 21 29 0 22-17 32-44 32H10V8Zm24 20v29h30c12 0 19-5 19-15 0-9-7-14-19-14H34Zm0 48v33h33c13 0 20-5 20-16s-7-17-20-17H34Z"
+  />
+  <path
+    d="M83 116V84l34 32V84"
+    fill="none"
+    stroke="#0c1529"
+    stroke-width="12"
+    stroke-linecap="square"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M83 116V84l34 32V84"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="6"
+    stroke-linecap="square"
+    stroke-linejoin="round"
+  />
+</svg>
