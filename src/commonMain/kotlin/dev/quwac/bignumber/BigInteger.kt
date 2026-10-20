@@ -4,6 +4,8 @@ package dev.quwac.bignumber
  * An immutable arbitrary-precision integer implemented entirely in common Kotlin.
  *
  * The concrete magnitude representation is deliberately not part of the public API.
+ *
+ * @property signum -1 for negative values, 0 for zero, or 1 for positive values.
  */
 @Suppress("TooManyFunctions") // Conventional numeric operations belong on the value type.
 class BigInteger private constructor(
@@ -13,10 +15,18 @@ class BigInteger private constructor(
 ) : Comparable<BigInteger> {
     private constructor(value: BigInteger) : this(value.signum, value.magnitude)
 
-    /** Creates a base-10 integer from [value]. */
+    /**
+     * Creates a base-10 integer from [value].
+     *
+     * @throws IllegalArgumentException when [value] is not a valid integer.
+     */
     constructor(value: String) : this(parse(value))
 
-    /** Creates an integer from [value] expressed in [radix]. */
+    /**
+     * Creates an integer from [value] expressed in [radix].
+     *
+     * @throws IllegalArgumentException when [radix] is outside `2..36` or [value] is invalid.
+     */
     constructor(value: String, radix: Int) : this(parse(value, radix))
 
     /** Compatibility alias for [signum]. */
@@ -25,6 +35,7 @@ class BigInteger private constructor(
     /** Returns true when this value is zero. */
     val isZero: Boolean get() = signum == 0
 
+    /** Compares this value with [other] numerically. */
     override fun compareTo(other: BigInteger): Int {
         if (signum != other.signum) return signum.compareTo(other.signum)
         if (signum == 0) return 0
@@ -32,13 +43,16 @@ class BigInteger private constructor(
         return if (signum > 0) magnitudeComparison else -magnitudeComparison
     }
 
+    /** Returns this value unchanged. */
     operator fun unaryPlus(): BigInteger = this
 
+    /** Returns the additive inverse of this value. */
     operator fun unaryMinus(): BigInteger = when (signum) {
         0 -> this
         else -> BigInteger(-signum, magnitude)
     }
 
+    /** Returns the sum of this value and [other]. */
     operator fun plus(other: BigInteger): BigInteger {
         if (isZero) return other
         if (other.isZero) return this
@@ -52,17 +66,27 @@ class BigInteger private constructor(
         }
     }
 
+    /** Returns this value minus [other]. */
     operator fun minus(other: BigInteger): BigInteger = this + -other
 
+    /** Returns the product of this value and [other]. */
     operator fun times(other: BigInteger): BigInteger {
         if (isZero || other.isZero) return ZERO
         return fromMagnitude(signum * other.signum, multiplyMagnitude(magnitude, other.magnitude))
     }
 
-    /** Divides toward zero. */
+    /**
+     * Divides this value by [other], rounding toward zero.
+     *
+     * @throws ArithmeticException when [other] is zero.
+     */
     operator fun div(other: BigInteger): BigInteger = divideAndRemainder(other).first
 
-    /** Returns a remainder with this value's sign. */
+    /**
+     * Returns the remainder after division by [other], with this value's sign.
+     *
+     * @throws ArithmeticException when [other] is zero.
+     */
     operator fun rem(other: BigInteger): BigInteger = divideAndRemainder(other).second
 
     /**
@@ -163,7 +187,11 @@ class BigInteger private constructor(
     fun shiftRight(bitCount: Int): BigInteger =
         if (bitCount >= 0) shiftRightPositive(bitCount.toLong()) else shiftLeftPositive(-bitCount.toLong())
 
-    /** Returns true when the bit at non-negative [index] is set. */
+    /**
+     * Returns true when the bit at non-negative [index] is set.
+     *
+     * @throws ArithmeticException when [index] is negative.
+     */
     fun testBit(index: Int): Boolean {
         requireBitIndex(index)
         val bits = if (signum < 0) (-this - ONE).toString(BINARY_RADIX) else toString(BINARY_RADIX)
@@ -171,19 +199,31 @@ class BigInteger private constructor(
         return if (signum < 0) !differsFromSignBit else differsFromSignBit
     }
 
-    /** Returns a value with the bit at non-negative [index] set. */
+    /**
+     * Returns a value with the bit at non-negative [index] set.
+     *
+     * @throws ArithmeticException when [index] is negative.
+     */
     fun setBit(index: Int): BigInteger {
         requireBitIndex(index)
         return if (testBit(index)) this else this + powerOfTwo(index)
     }
 
-    /** Returns a value with the bit at non-negative [index] cleared. */
+    /**
+     * Returns a value with the bit at non-negative [index] cleared.
+     *
+     * @throws ArithmeticException when [index] is negative.
+     */
     fun clearBit(index: Int): BigInteger {
         requireBitIndex(index)
         return if (testBit(index)) this - powerOfTwo(index) else this
     }
 
-    /** Returns a value with the bit at non-negative [index] inverted. */
+    /**
+     * Returns a value with the bit at non-negative [index] inverted.
+     *
+     * @throws ArithmeticException when [index] is negative.
+     */
     fun flipBit(index: Int): BigInteger {
         requireBitIndex(index)
         val bit = powerOfTwo(index)
@@ -239,31 +279,67 @@ class BigInteger private constructor(
     /** Returns the low 64 bits as an unsigned [ULong]. */
     fun toULong(): ULong = lowULong()
 
-    /** @throws ArithmeticException when this value does not fit in a [Byte]. */
+    /**
+     * Returns this value as a [Byte].
+     *
+     * @throws ArithmeticException when this value does not fit in a [Byte].
+     */
     fun toByteExact(): Byte = requireSignedRange(BYTE_MIN, BYTE_MAX, "Byte").toString().toByte()
 
-    /** @throws ArithmeticException when this value does not fit in a [Short]. */
+    /**
+     * Returns this value as a [Short].
+     *
+     * @throws ArithmeticException when this value does not fit in a [Short].
+     */
     fun toShortExact(): Short = requireSignedRange(SHORT_MIN, SHORT_MAX, "Short").toString().toShort()
 
-    /** @throws ArithmeticException when this value does not fit in an [Int]. */
+    /**
+     * Returns this value as an [Int].
+     *
+     * @throws ArithmeticException when this value does not fit in an [Int].
+     */
     fun toIntExact(): Int = requireSignedRange(INT_MIN, INT_MAX, "Int").toString().toInt()
 
-    /** @throws ArithmeticException when this value does not fit in a [Long]. */
+    /**
+     * Returns this value as a [Long].
+     *
+     * @throws ArithmeticException when this value does not fit in a [Long].
+     */
     fun toLongExact(): Long = requireSignedRange(LONG_MIN, LONG_MAX, "Long").toString().toLong()
 
-    /** @throws ArithmeticException when this value does not fit in a [UByte]. */
+    /**
+     * Returns this value as a [UByte].
+     *
+     * @throws ArithmeticException when this value does not fit in a [UByte].
+     */
     fun toUByteExact(): UByte = requireUnsignedRange(UBYTE_MAX, "UByte").toString().toUByte()
 
-    /** @throws ArithmeticException when this value does not fit in a [UShort]. */
+    /**
+     * Returns this value as a [UShort].
+     *
+     * @throws ArithmeticException when this value does not fit in a [UShort].
+     */
     fun toUShortExact(): UShort = requireUnsignedRange(USHORT_MAX, "UShort").toString().toUShort()
 
-    /** @throws ArithmeticException when this value does not fit in a [UInt]. */
+    /**
+     * Returns this value as a [UInt].
+     *
+     * @throws ArithmeticException when this value does not fit in a [UInt].
+     */
     fun toUIntExact(): UInt = requireUnsignedRange(UINT_MAX, "UInt").toString().toUInt()
 
-    /** @throws ArithmeticException when this value does not fit in a [ULong]. */
+    /**
+     * Returns this value as a [ULong].
+     *
+     * @throws ArithmeticException when this value does not fit in a [ULong].
+     */
     fun toULongExact(): ULong = requireUnsignedRange(ULONG_MAX, "ULong").toString().toULong()
 
-    /** Returns a lowercase string representation in [radix]. */
+    /**
+     * Returns a lowercase string representation in [radix].
+     *
+     * @throws IllegalArgumentException when [radix] is outside `2..36`.
+     */
     @Suppress("ReturnCount")
     fun toString(radix: Int): String {
         requireRadix(radix)
@@ -289,11 +365,14 @@ class BigInteger private constructor(
 
     internal val isOdd: Boolean get() = magnitude.last().digitToInt() % 2 != 0
 
+    /** Returns true when [other] is a [BigInteger] with the same numerical value. */
     override fun equals(other: Any?): Boolean =
         other is BigInteger && signum == other.signum && magnitude == other.magnitude
 
+    /** Returns a hash code based on this value. */
     override fun hashCode(): Int = 31 * signum + magnitude.hashCode()
 
+    /** Returns the base-10 string representation of this value. */
     override fun toString(): String = if (signum < 0) "-$magnitude" else magnitude
 
     private fun lowUInt(): UInt {
@@ -360,9 +439,15 @@ class BigInteger private constructor(
         return this
     }
 
+    /** Provides common values and factory functions for [BigInteger]. */
     companion object {
+        /** The value zero. */
         val ZERO: BigInteger = BigInteger(0, "0")
+
+        /** The value one. */
         val ONE: BigInteger = BigInteger(1, "1")
+
+        /** The value ten. */
         val TEN: BigInteger = BigInteger(1, "10")
 
         private val NEGATIVE_ONE: BigInteger = BigInteger(-1, "1")
@@ -403,23 +488,35 @@ class BigInteger private constructor(
             if (index < 0) throw ArithmeticException("Negative bit address")
         }
 
+        /** Creates an arbitrary-precision integer from [value]. */
         fun of(value: Byte): BigInteger = decimal(value.toString())
 
+        /** Creates an arbitrary-precision integer from [value]. */
         fun of(value: Short): BigInteger = decimal(value.toString())
 
+        /** Creates an arbitrary-precision integer from [value]. */
         fun of(value: Int): BigInteger = decimal(value.toString())
 
+        /** Creates an arbitrary-precision integer from [value]. */
         fun of(value: Long): BigInteger = decimal(value.toString())
 
+        /** Creates an arbitrary-precision integer from [value]. */
         fun of(value: UByte): BigInteger = decimal(value.toString())
 
+        /** Creates an arbitrary-precision integer from [value]. */
         fun of(value: UShort): BigInteger = decimal(value.toString())
 
+        /** Creates an arbitrary-precision integer from [value]. */
         fun of(value: UInt): BigInteger = decimal(value.toString())
 
+        /** Creates an arbitrary-precision integer from [value]. */
         fun of(value: ULong): BigInteger = decimal(value.toString())
 
-        /** Parses a base-10 integer. */
+        /**
+         * Parses a base-10 integer from [value].
+         *
+         * @throws IllegalArgumentException when [value] is not a valid integer.
+         */
         fun parse(value: String): BigInteger = parse(value, DECIMAL_RADIX)
 
         /**

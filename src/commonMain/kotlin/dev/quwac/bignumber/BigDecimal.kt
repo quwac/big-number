@@ -10,12 +10,20 @@ import kotlin.math.max
  * A value is represented by an [unscaledValue] and a decimal [scale]. Numerically equal values may
  * have different scales. [equals] requires both the value and scale to match, while [compareTo]
  * compares numerical values.
+ *
+ * @property unscaledValue The integer obtained by removing this value's decimal point.
+ * @property scale The number of digits to the right of the decimal point. A negative value places
+ * the decimal point to the right of the unscaled value.
  */
 @Suppress("TooManyFunctions") // Conventional decimal operations belong on the value type.
 class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<BigDecimal> {
     private constructor(value: BigDecimal) : this(value.unscaledValue, value.scale)
 
-    /** Creates a decimal from [value], preserving its parsed scale. */
+    /**
+     * Creates a decimal from [value], preserving its parsed scale.
+     *
+     * @throws IllegalArgumentException when [value] is not valid decimal notation.
+     */
     constructor(value: String) : this(parse(value))
 
     /** Creates a scale-zero decimal from [value]. */
@@ -33,6 +41,7 @@ class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<Big
     /** Returns the number of decimal digits in the unscaled value; zero has precision one. */
     val precision: Int get() = unscaledValue.magnitude.length
 
+    /** Compares this value with [other] numerically, independently of scale. */
     override fun compareTo(other: BigDecimal): Int {
         if (signum != other.signum) return signum.compareTo(other.signum)
         if (signum == 0) return 0
@@ -40,10 +49,13 @@ class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<Big
         return if (signum > 0) magnitudeComparison else -magnitudeComparison
     }
 
+    /** Returns this value unchanged. */
     operator fun unaryPlus(): BigDecimal = this
 
+    /** Returns the additive inverse of this value, preserving scale. */
     operator fun unaryMinus(): BigDecimal = if (isZero) this else of(-unscaledValue, scale)
 
+    /** Returns the sum of this value and [other]. */
     operator fun plus(other: BigDecimal): BigDecimal {
         val resultScale = maxOf(scale, other.scale)
         val left = unscaledValue.timesPowerOfTen(scaleDifference(resultScale, scale))
@@ -54,11 +66,13 @@ class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<Big
     /** Adds [other] and rounds the exact result according to [mathContext]. */
     fun plus(other: BigDecimal, mathContext: MathContext): BigDecimal = (this + other).round(mathContext)
 
+    /** Returns this value minus [other]. */
     operator fun minus(other: BigDecimal): BigDecimal = this + -other
 
     /** Subtracts [other] and rounds the exact result according to [mathContext]. */
     fun minus(other: BigDecimal, mathContext: MathContext): BigDecimal = (this - other).round(mathContext)
 
+    /** Returns the product of this value and [other]. */
     operator fun times(other: BigDecimal): BigDecimal =
         of(unscaledValue * other.unscaledValue, checkedScale(scale.toLong() + other.scale.toLong()))
 
@@ -73,7 +87,12 @@ class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<Big
      */
     operator fun div(other: BigDecimal): BigDecimal = divide(other)
 
-    /** Performs exact division with the same behavior as the `/` operator. */
+    /**
+     * Performs exact division with the same behavior as the `/` operator.
+     *
+     * @throws ArithmeticException when [other] is zero, the exact result has a non-terminating
+     * decimal expansion, or the result scale is outside the supported [Int] range.
+     */
     fun divide(other: BigDecimal): BigDecimal {
         if (other.isZero) throw ArithmeticException("Division by zero")
         val preferredScale = checkedScale(scale.toLong() - other.scale.toLong())
@@ -106,6 +125,9 @@ class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<Big
      * Divides to [resultScale], applying [roundingMode] when discarded digits are non-zero.
      *
      * The returned value always has [resultScale].
+     *
+     * @throws ArithmeticException when [other] is zero, rounding is required and [roundingMode] is
+     * [RoundingMode.UNNECESSARY], or an intermediate scale is outside the supported [Int] range.
      */
     fun divide(other: BigDecimal, resultScale: Int, roundingMode: RoundingMode): BigDecimal {
         if (other.isZero) throw ArithmeticException("Division by zero")
@@ -127,13 +149,21 @@ class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<Big
         return of(if (resultSign < 0) -rounded else rounded, resultScale)
     }
 
-    /** Divides using this value's scale and [roundingMode]. */
+    /**
+     * Divides using this value's scale and [roundingMode].
+     *
+     * @throws ArithmeticException when [other] is zero or rounding is required and [roundingMode]
+     * is [RoundingMode.UNNECESSARY].
+     */
     fun divide(other: BigDecimal, roundingMode: RoundingMode): BigDecimal = divide(other, scale, roundingMode)
 
     /**
      * Divides and rounds to the significant-digit precision in [mathContext].
      *
      * An unlimited context requires an exact terminating result.
+     *
+     * @throws ArithmeticException when [other] is zero, the result cannot be represented exactly
+     * under the requested rounding mode, or a result scale is outside the supported [Int] range.
      */
     @Suppress("ReturnCount")
     fun divide(other: BigDecimal, mathContext: MathContext): BigDecimal {
@@ -164,7 +194,11 @@ class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<Big
         return this - quotient * other
     }
 
-    /** Returns the integral quotient and remainder after division toward zero. */
+    /**
+     * Returns the integral quotient and remainder after division toward zero.
+     *
+     * @throws ArithmeticException when [other] is zero.
+     */
     fun divideAndRemainder(other: BigDecimal): Pair<BigDecimal, BigDecimal> {
         val quotient = integralQuotient(other)
         return quotient to (this - quotient * other)
@@ -177,7 +211,12 @@ class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<Big
      */
     fun setScale(newScale: Int): BigDecimal = setScale(newScale, RoundingMode.UNNECESSARY)
 
-    /** Returns this value with [newScale], applying [roundingMode] when digits are discarded. */
+    /**
+     * Returns this value with [newScale], applying [roundingMode] when digits are discarded.
+     *
+     * @throws ArithmeticException when rounding is required and [roundingMode] is
+     * [RoundingMode.UNNECESSARY].
+     */
     fun setScale(newScale: Int, roundingMode: RoundingMode): BigDecimal {
         if (newScale == scale) return this
         if (isZero) return of(BigInteger.ZERO, newScale)
@@ -196,7 +235,12 @@ class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<Big
     /** Compatibility scale-rounding operation; equivalent to [setScale]. */
     fun round(resultScale: Int, roundingMode: RoundingMode): BigDecimal = setScale(resultScale, roundingMode)
 
-    /** Rounds to the significant-digit precision in [mathContext]. */
+    /**
+     * Rounds to the significant-digit precision in [mathContext].
+     *
+     * @throws ArithmeticException when rounding is required and the context uses
+     * [RoundingMode.UNNECESSARY].
+     */
     fun round(mathContext: MathContext): BigDecimal {
         val targetPrecision = mathContext.precision
         if (targetPrecision == 0 || precision <= targetPrecision) return this
@@ -316,9 +360,11 @@ class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<Big
         return "$signPrefix$coefficient${formatExponent(adjustedExponent)}"
     }
 
+    /** Returns true when [other] has the same unscaled value and scale. */
     override fun equals(other: Any?): Boolean =
         other is BigDecimal && unscaledValue == other.unscaledValue && scale == other.scale
 
+    /** Returns a hash code based on the unscaled value and scale. */
     override fun hashCode(): Int = 31 * unscaledValue.hashCode() + scale
 
     @Suppress("ReturnCount")
@@ -372,42 +418,65 @@ class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<Big
 
     private fun adjustedExponent(): Long = precision.toLong() - scale.toLong() - 1L
 
+    /** Provides common values and factory functions for [BigDecimal]. */
     companion object {
+        /** The scale-zero value zero. */
         val ZERO: BigDecimal = BigDecimal(BigInteger.ZERO, 0)
+
+        /** The scale-zero value one. */
         val ONE: BigDecimal = BigDecimal(BigInteger.ONE, 0)
+
+        /** The scale-zero value ten. */
         val TEN: BigDecimal = BigDecimal(BigInteger.TEN, 0)
 
         private val TWO = BigInteger.of(2)
         private val FIVE = BigInteger.of(5)
 
+        /** Creates a scale-zero arbitrary-precision decimal from [value]. */
         fun of(value: Byte): BigDecimal = of(BigInteger.of(value), 0)
 
+        /** Creates a scale-zero arbitrary-precision decimal from [value]. */
         fun of(value: Short): BigDecimal = of(BigInteger.of(value), 0)
 
+        /** Creates a scale-zero arbitrary-precision decimal from [value]. */
         fun of(value: Int): BigDecimal = of(BigInteger.of(value), 0)
 
+        /** Creates a scale-zero arbitrary-precision decimal from [value]. */
         fun of(value: Long): BigDecimal = of(BigInteger.of(value), 0)
 
-        /** Creates a decimal from the canonical string representation of [value]. */
+        /**
+         * Creates a decimal from the canonical string representation of [value].
+         *
+         * @throws IllegalArgumentException when [value] is not finite.
+         */
         fun of(value: Float): BigDecimal {
             require(value.isFinite()) { "BigDecimal requires a finite Float" }
             return parse(value.toString())
         }
 
-        /** Creates a decimal from the canonical string representation of [value]. */
+        /**
+         * Creates a decimal from the canonical string representation of [value].
+         *
+         * @throws IllegalArgumentException when [value] is not finite.
+         */
         fun of(value: Double): BigDecimal {
             require(value.isFinite()) { "BigDecimal requires a finite Double" }
             return parse(value.toString())
         }
 
+        /** Creates a scale-zero arbitrary-precision decimal from [value]. */
         fun of(value: UByte): BigDecimal = of(BigInteger.of(value), 0)
 
+        /** Creates a scale-zero arbitrary-precision decimal from [value]. */
         fun of(value: UShort): BigDecimal = of(BigInteger.of(value), 0)
 
+        /** Creates a scale-zero arbitrary-precision decimal from [value]. */
         fun of(value: UInt): BigDecimal = of(BigInteger.of(value), 0)
 
+        /** Creates a scale-zero arbitrary-precision decimal from [value]. */
         fun of(value: ULong): BigDecimal = of(BigInteger.of(value), 0)
 
+        /** Creates a scale-zero arbitrary-precision decimal from [value]. */
         fun of(value: BigInteger): BigDecimal = of(value, 0)
 
         /** Creates a decimal with the exact [unscaledValue] and [scale]. */
@@ -418,7 +487,11 @@ class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<Big
             else -> BigDecimal(unscaledValue, scale)
         }
 
-        /** Parses a decimal, preserving trailing zeros and exponent-derived scale. */
+        /**
+         * Parses a decimal from [value], preserving trailing zeros and exponent-derived scale.
+         *
+         * @throws IllegalArgumentException when [value] is not valid decimal notation.
+         */
         fun parse(value: String): BigDecimal =
             parseOrNull(value) ?: throw IllegalArgumentException("Invalid BigDecimal: $value")
 
