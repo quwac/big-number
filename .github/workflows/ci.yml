@@ -13,7 +13,52 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      verification_required: ${{ steps.source.outputs.verification_required }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: source
+        name: Detect source changes
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          test_paths=(
+            src
+            build.gradle.kts
+            settings.gradle.kts
+            gradle.properties
+            gradle
+            gradlew
+            gradlew.bat
+            kotlin-js-store
+            mise.toml
+            mise.lock
+            config/detekt
+            .github/dependabot.yml
+            .github/workflows
+          )
+
+          if [[ -z "$BASE_SHA" ]] || ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            echo "Unable to determine the base commit; running verification."
+            echo "verification_required=true" >> "$GITHUB_OUTPUT"
+          elif git diff --quiet "$BASE_SHA...$GITHUB_SHA" -- "${test_paths[@]}"; then
+            echo "No source or verification inputs changed; skipping verification."
+            echo "verification_required=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Source or verification inputs changed; running verification."
+            echo "verification_required=true" >> "$GITHUB_OUTPUT"
+          fi
+
   quality:
+    needs: changes
+    if: ${{ needs.changes.outputs.verification_required == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -34,6 +79,8 @@ jobs:
           PINACT_GITHUB_TOKEN: ${{ github.token }}
 
   linux-tests:
+    needs: changes
+    if: ${{ needs.changes.outputs.verification_required == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -50,6 +97,8 @@ jobs:
       - run: ./gradlew allTests publishToMavenLocal
 
   apple-tests:
+    needs: changes
+    if: ${{ needs.changes.outputs.verification_required == 'true' }}
     runs-on: macos-15
     timeout-minutes: 25
     steps:
@@ -66,6 +115,8 @@ jobs:
       - run: ./gradlew macosArm64Test iosSimulatorArm64Test tvosSimulatorArm64Test watchosSimulatorArm64Test
 
   windows-tests:
+    needs: changes
+    if: ${{ needs.changes.outputs.verification_required == 'true' }}
     runs-on: windows-latest
     timeout-minutes: 25
     steps:
@@ -83,13 +134,14 @@ jobs:
 
   test:
     if: ${{ always() }}
-    needs: [quality, linux-tests, apple-tests, windows-tests]
+    needs: [changes, quality, linux-tests, apple-tests, windows-tests]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Require successful verification jobs
         run: |
-          test "${{ needs.quality.result }}" = success
-          test "${{ needs.linux-tests.result }}" = success
-          test "${{ needs.apple-tests.result }}" = success
-          test "${{ needs.windows-tests.result }}" = success
+          test "${{ needs.changes.result }}" = success
+          test "${{ needs.quality.result }}" = success || test "${{ needs.quality.result }}" = skipped
+          test "${{ needs.linux-tests.result }}" = success || test "${{ needs.linux-tests.result }}" = skipped
+          test "${{ needs.apple-tests.result }}" = success || test "${{ needs.apple-tests.result }}" = skipped
+          test "${{ needs.windows-tests.result }}" = success || test "${{ needs.windows-tests.result }}" = skipped
