@@ -1,4 +1,17 @@
-# BigNumber
+<p align="center">
+  <img src="docs/assets/bignumber-logo.png" alt="BigNumber logo" width="420">
+</p>
+
+<h1 align="center">BigNumber</h1>
+
+<p align="center">
+  <a href="https://github.com/quwac/big-number/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/CI-Verify-2088FF?logo=githubactions&amp;logoColor=white" alt="CI: Verify"></a>
+  <a href="https://kotlinlang.org/"><img src="https://img.shields.io/badge/Kotlin-2.4.21-7F52FF?logo=kotlin&amp;logoColor=white" alt="Kotlin 2.4.21"></a>
+  <a href="#supported-targets"><img src="https://img.shields.io/badge/Kotlin-Multiplatform-7F52FF?logo=kotlin&amp;logoColor=white" alt="Kotlin Multiplatform"></a>
+  <a href="https://gradle.org/"><img src="https://img.shields.io/badge/Gradle-9.8.1-02303A?logo=gradle&amp;logoColor=white" alt="Gradle 9.8.1"></a>
+  <a href="https://openjdk.org/"><img src="https://img.shields.io/badge/JDK-17-007396?logo=openjdk&amp;logoColor=white" alt="JDK 17"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License"></a>
+</p>
 
 Pure Kotlin arbitrary-precision integers and decimals with identical semantics across Kotlin Multiplatform targets.
 
