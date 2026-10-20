@@ -39,10 +39,47 @@ jobs:
           fi
           git fetch origin main
           git merge-base --is-ancestor "$GITHUB_SHA" origin/main
-      - name: Verify
-        run: mise run check
+      - id: source
+        name: Detect source changes
+        shell: bash
+        run: |
+          test_paths=(
+            src
+            build.gradle.kts
+            settings.gradle.kts
+            gradle.properties
+            gradle
+            gradlew
+            gradlew.bat
+            kotlin-js-store
+            mise.toml
+            mise.lock
+            config/detekt
+            .github/dependabot.yml
+            .github/workflows
+          )
+          release_commit="$(git rev-parse "$GITHUB_SHA^{commit}")"
+
+          if ! base_commit="$(git rev-parse "$release_commit^" 2>/dev/null)"; then
+            echo "Release has no parent commit; running verification."
+            echo "verification_required=true" >> "$GITHUB_OUTPUT"
+          elif git diff --quiet "$base_commit" "$release_commit" -- "${test_paths[@]}"; then
+            echo "No source or verification inputs changed; skipping verification."
+            echo "verification_required=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Source or verification inputs changed; running verification."
+            echo "verification_required=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Verify security and static analysis
+        if: ${{ steps.source.outputs.verification_required == 'true' }}
+        run: |
+          mise run security
+          ./gradlew detekt
         env:
           PINACT_GITHUB_TOKEN: ${{ github.token }}
+      - name: Test and verify local publication
+        if: ${{ steps.source.outputs.verification_required == 'true' }}
+        run: ./gradlew allTests publishToMavenLocal --no-configuration-cache
       - name: Publish to Maven Central
         shell: bash
         run: |

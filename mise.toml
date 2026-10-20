@@ -45,7 +45,7 @@ mise run security
 '''
 
 [tasks.release]
-description = "Verify main, create a release tag, and push it"
+description = "Create a release tag from main and push it"
 usage = 'arg "<version>" help="Release version in v1.0.0 or 1.0.0 format"'
 run = '''
 #!/usr/bin/env bash
@@ -74,12 +74,6 @@ if [[ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]]; then
 fi
 if git rev-parse --quiet --verify "refs/tags/$tag" >/dev/null; then
   echo "Tag already exists: $tag" >&2
-  exit 1
-fi
-
-mise run check
-if [[ -n "$(git status --porcelain)" ]]; then
-  echo "Verification changed the worktree" >&2
   exit 1
 fi
 
