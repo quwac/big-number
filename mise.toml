@@ -1,5 +1,12 @@
+[tool_alias]
+jactionlint = "github:jdx/jactionlint"
+
 [tools]
+betterleaks = "1.9.0"
+jactionlint = "2.1.0"
 java = "temurin-17.0.20+101"
+pinact = "5.0.0"
+zizmor = "1.30.1"
 
 [settings]
 lockfile = true
@@ -13,9 +20,19 @@ description = "Run tests available on the current host"
 run = "./gradlew allTests"
 
 [tasks.check]
-description = "Run static analysis, tests, and local publication verification"
+description = "Run security checks, static analysis, tests, and local publication verification"
 run = [
+    "mise run security",
     "./gradlew detekt",
     "./gradlew allTests",
     "./gradlew publishToMavenLocal",
+]
+
+[tasks.security]
+description = "Scan secrets and validate GitHub Actions"
+run = [
+    "betterleaks --no-banner --redact git .",
+    "pinact run --check --verify-comment",
+    "jactionlint",
+    "zizmor --offline --no-progress --color never .",
 ]
