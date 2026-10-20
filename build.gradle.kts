@@ -24,9 +24,12 @@ val xcodeAvailable = if (isMacOs) {
     providers.provider { false }
 }
 
-org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
-    .apply(rootProject)
-    .versions.webpack.version = "5.112.0"
+val nodeJsRoot = org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin.apply(rootProject)
+rootProject.extensions.configure<org.jetbrains.kotlin.gradle.targets.js.npm.NpmExtension> {
+    override("diff", "8.0.3")
+    override("serialize-javascript", "7.0.5")
+}
+nodeJsRoot.versions.webpack.version = "5.112.0"
 
 kotlin {
     jvm()
