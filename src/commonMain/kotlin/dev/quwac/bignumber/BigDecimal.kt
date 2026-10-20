@@ -388,6 +388,18 @@ class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<Big
 
         fun of(value: Long): BigDecimal = of(BigInteger.of(value), 0)
 
+        /** Creates a decimal from the canonical string representation of [value]. */
+        fun of(value: Float): BigDecimal {
+            require(value.isFinite()) { "BigDecimal requires a finite Float" }
+            return parse(value.toString())
+        }
+
+        /** Creates a decimal from the canonical string representation of [value]. */
+        fun of(value: Double): BigDecimal {
+            require(value.isFinite()) { "BigDecimal requires a finite Double" }
+            return parse(value.toString())
+        }
+
         fun of(value: UByte): BigDecimal = of(BigInteger.of(value), 0)
 
         fun of(value: UShort): BigDecimal = of(BigInteger.of(value), 0)

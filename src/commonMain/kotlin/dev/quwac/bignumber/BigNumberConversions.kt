@@ -44,6 +44,12 @@ fun Int.toBigDecimal(): BigDecimal = BigDecimal.of(this)
 /** Returns this value as a scale-zero arbitrary-precision decimal. */
 fun Long.toBigDecimal(): BigDecimal = BigDecimal.of(this)
 
+/** Returns the canonical decimal representation of this finite value. */
+fun Float.toBigDecimal(): BigDecimal = BigDecimal.of(this)
+
+/** Returns the canonical decimal representation of this finite value. */
+fun Double.toBigDecimal(): BigDecimal = BigDecimal.of(this)
+
 /** Returns this value as a scale-zero arbitrary-precision decimal. */
 fun UByte.toBigDecimal(): BigDecimal = BigDecimal.of(this)
 

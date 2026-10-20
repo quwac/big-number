@@ -61,6 +61,169 @@ class BigDecimalTest {
         assertDecimal("10802469038580246903.859375", 6, left * right)
     }
 
+    @Suppress("LongMethod") // The complete primitive/operator matrix belongs in one test.
+    @Test
+    fun interoperatesWithConcreteNumericTypesInBothOperandOrders() {
+        val decimal = BigDecimal("2.50")
+        val byteValue: Byte = 1.toByte()
+        val shortValue: Short = 1.toShort()
+        val intValue: Int = 1
+        val longValue: Long = 1L
+        val floatValue: Float = 1.0F
+        val doubleValue: Double = 1.0
+        val uByteValue: UByte = 1.toUByte()
+        val uShortValue: UShort = 1.toUShort()
+        val uIntValue: UInt = 1u
+        val uLongValue: ULong = 1uL
+
+        listOf(
+            decimal + byteValue,
+            byteValue + decimal,
+            decimal + shortValue,
+            shortValue + decimal,
+            decimal + intValue,
+            intValue + decimal,
+            decimal + longValue,
+            longValue + decimal,
+            decimal + floatValue,
+            floatValue + decimal,
+            decimal + doubleValue,
+            doubleValue + decimal,
+            decimal + uByteValue,
+            uByteValue + decimal,
+            decimal + uShortValue,
+            uShortValue + decimal,
+            decimal + uIntValue,
+            uIntValue + decimal,
+            decimal + uLongValue,
+            uLongValue + decimal,
+        ).forEach { assertNumericallyEquals("3.5", it) }
+        listOf(
+            decimal - byteValue,
+            decimal - shortValue,
+            decimal - intValue,
+            decimal - longValue,
+            decimal - floatValue,
+            decimal - doubleValue,
+            decimal - uByteValue,
+            decimal - uShortValue,
+            decimal - uIntValue,
+            decimal - uLongValue,
+        ).forEach { assertNumericallyEquals("1.5", it) }
+        listOf(
+            byteValue - decimal,
+            shortValue - decimal,
+            intValue - decimal,
+            longValue - decimal,
+            floatValue - decimal,
+            doubleValue - decimal,
+            uByteValue - decimal,
+            uShortValue - decimal,
+            uIntValue - decimal,
+            uLongValue - decimal,
+        ).forEach { assertNumericallyEquals("-1.5", it) }
+        listOf(
+            decimal * byteValue,
+            byteValue * decimal,
+            decimal * shortValue,
+            shortValue * decimal,
+            decimal * intValue,
+            intValue * decimal,
+            decimal * longValue,
+            longValue * decimal,
+            decimal * floatValue,
+            floatValue * decimal,
+            decimal * doubleValue,
+            doubleValue * decimal,
+            decimal * uByteValue,
+            uByteValue * decimal,
+            decimal * uShortValue,
+            uShortValue * decimal,
+            decimal * uIntValue,
+            uIntValue * decimal,
+            decimal * uLongValue,
+            uLongValue * decimal,
+        ).forEach { assertNumericallyEquals("2.5", it) }
+        listOf(
+            decimal / byteValue,
+            decimal / shortValue,
+            decimal / intValue,
+            decimal / longValue,
+            decimal / floatValue,
+            decimal / doubleValue,
+            decimal / uByteValue,
+            decimal / uShortValue,
+            decimal / uIntValue,
+            decimal / uLongValue,
+        ).forEach { assertNumericallyEquals("2.5", it) }
+        listOf(
+            byteValue / decimal,
+            shortValue / decimal,
+            intValue / decimal,
+            longValue / decimal,
+            floatValue / decimal,
+            doubleValue / decimal,
+            uByteValue / decimal,
+            uShortValue / decimal,
+            uIntValue / decimal,
+            uLongValue / decimal,
+        ).forEach { assertNumericallyEquals("0.4", it) }
+        listOf(
+            decimal % byteValue,
+            decimal % shortValue,
+            decimal % intValue,
+            decimal % longValue,
+            decimal % floatValue,
+            decimal % doubleValue,
+            decimal % uByteValue,
+            decimal % uShortValue,
+            decimal % uIntValue,
+            decimal % uLongValue,
+        ).forEach { assertNumericallyEquals("0.5", it) }
+        listOf(
+            byteValue % decimal,
+            shortValue % decimal,
+            intValue % decimal,
+            longValue % decimal,
+            floatValue % decimal,
+            doubleValue % decimal,
+            uByteValue % decimal,
+            uShortValue % decimal,
+            uIntValue % decimal,
+            uLongValue % decimal,
+        ).forEach { assertNumericallyEquals("1", it) }
+        assertTrue(
+            listOf(
+                (decimal > byteValue),
+                (byteValue < decimal),
+                (decimal > shortValue),
+                (shortValue < decimal),
+                (decimal > intValue),
+                (intValue < decimal),
+                (decimal > longValue),
+                (longValue < decimal),
+                (decimal > floatValue),
+                (floatValue < decimal),
+                (decimal > doubleValue),
+                (doubleValue < decimal),
+                (decimal > uByteValue),
+                (uByteValue < decimal),
+                (decimal > uShortValue),
+                (uShortValue < decimal),
+                (decimal > uIntValue),
+                (uIntValue < decimal),
+                (decimal > uLongValue),
+                (uLongValue < decimal),
+            ).all { it },
+        )
+
+        assertDecimal("5.50", 2, 3 + decimal)
+        assertDecimal("0.25", 2, BigDecimal("0.5") * 0.5)
+        assertEquals(BigDecimal("0.5"), 0.5.toBigDecimal())
+        assertFailsWith<IllegalArgumentException> { Double.NaN.toBigDecimal() }
+        assertFailsWith<IllegalArgumentException> { BigDecimal.ONE + Float.POSITIVE_INFINITY }
+    }
+
     @Test
     fun exactDivisionUsesPreferredScaleAndRejectsNonTerminatingResults() {
         assertDecimal("0.125", 3, BigDecimal.ONE / BigDecimal.of(8))
@@ -164,4 +327,8 @@ class BigDecimalTest {
 private fun assertDecimal(expectedText: String, expectedScale: Int, actual: BigDecimal) {
     assertEquals(expectedText, actual.toString())
     assertEquals(expectedScale, actual.scale)
+}
+
+private fun assertNumericallyEquals(expectedText: String, actual: BigDecimal) {
+    assertEquals(0, BigDecimal(expectedText).compareTo(actual))
 }

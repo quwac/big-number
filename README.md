@@ -29,6 +29,7 @@ val amount = BigDecimal("10.50")
 val divisor = 4.toBigDecimal()
 
 val exact = amount / divisor // 2.625
+val total = 4 + amount // 14.50
 val rounded = amount.divide(
     BigDecimal("3"),
     MathContext(4, RoundingMode.HALF_EVEN),
@@ -62,6 +63,9 @@ Deprecated Kotlin/Native target presets are not published.
 - Scale-based division, `setScale`, and `MathContext` operations require an explicit `RoundingMode` when information may
   be discarded.
 - `RoundingMode.UNNECESSARY` throws `ArithmeticException` if rounding is required.
+- `Byte`, `Short`, `Int`, `Long`, `Float`, `Double`, and the unsigned integer types provide concrete overloads for
+  `+`, `-`, `*`, `/`, `%`, and ordered comparison with `BigDecimal` in either operand order. Floating-point operands
+  use their canonical decimal string representation; `NaN` and infinities are rejected.
 - `toString` uses canonical plain or scientific notation; `toPlainString` never uses an exponent and
   `toEngineeringString` uses exponents divisible by three.
 
