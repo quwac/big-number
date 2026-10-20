@@ -4,7 +4,7 @@ plugins {
     kotlin("multiplatform") version "2.4.21"
     id("com.android.kotlin.multiplatform.library") version "9.4.1"
     id("dev.detekt") version "2.0.0-alpha.6"
-    `maven-publish`
+    id("com.vanniktech.maven.publish") version "0.37.0"
 }
 
 group = "dev.quwac"
@@ -73,6 +73,17 @@ kotlin {
     }
 }
 
+mapOf(
+    "kotlinUpgradeYarnLock" to "kotlinUpgradePackageLock",
+    "kotlinWasmUpgradeYarnLock" to "kotlinWasmUpgradePackageLock",
+).forEach { (legacyTaskName, packageTaskName) ->
+    if (tasks.findByName(legacyTaskName) == null) {
+        tasks.register(legacyTaskName) {
+            dependsOn(packageTaskName)
+        }
+    }
+}
+
 val xcodeTestTargets = listOf(
     "iosSimulatorArm64",
     "iosX64",
@@ -101,24 +112,39 @@ tasks.named<dev.detekt.gradle.Detekt>("detekt") {
     include("**/*.kt", "**/*.kts")
 }
 
-publishing {
-    publications.withType<MavenPublication>().configureEach {
-        pom {
-            name = "BigNumber"
-            description =
-                "Pure Kotlin arbitrary-precision integers and decimals with identical semantics across Kotlin Multiplatform targets."
-            url = "https://github.com/quwac/big-number"
-            licenses {
-                license {
-                    name = "MIT License"
-                    url = "https://opensource.org/license/mit"
-                }
+mavenPublishing {
+    publishToMavenCentral()
+    if (providers.gradleProperty("signingInMemoryKey").isPresent) {
+        signAllPublications()
+    }
+
+    coordinates(group.toString(), "bignumber", version.toString())
+
+    pom {
+        name.set("BigNumber")
+        description.set(
+            "Pure Kotlin arbitrary-precision integers and decimals with identical semantics across Kotlin Multiplatform targets.",
+        )
+        inceptionYear.set("2026")
+        url.set("https://github.com/quwac/big-number")
+        licenses {
+            license {
+                name.set("MIT License")
+                url.set("https://opensource.org/license/mit")
+                distribution.set("repo")
             }
-            scm {
-                connection = "scm:git:https://github.com/quwac/big-number.git"
-                developerConnection = "scm:git:ssh://git@github.com/quwac/big-number.git"
-                url = "https://github.com/quwac/big-number"
+        }
+        developers {
+            developer {
+                id.set("quwac")
+                name.set("quwabara")
+                url.set("https://github.com/quwac")
             }
+        }
+        scm {
+            connection.set("scm:git:https://github.com/quwac/big-number.git")
+            developerConnection.set("scm:git:ssh://git@github.com/quwac/big-number.git")
+            url.set("https://github.com/quwac/big-number")
         }
     }
 }

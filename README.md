@@ -19,6 +19,28 @@ BigNumber provides immutable `BigInteger` and `BigDecimal` values. All arithmeti
 the library does not delegate to Java numeric classes, JavaScript `BigInt`, decimal.js, or platform-specific
 arbitrary-precision APIs.
 
+## Installation
+
+Add Maven Central and BigNumber to the `commonMain` source set:
+
+```kotlin
+repositories {
+    mavenCentral()
+}
+
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation("dev.quwac:bignumber:<version>")
+        }
+    }
+}
+```
+
+Replace `<version>` with the release you want to use.
+
+## Usage
+
 ```kotlin
 import dev.quwac.bignumber.*
 
@@ -99,11 +121,11 @@ The internal decimal-digit storage is not public API. It may be replaced without
 
 ## Build and local publication
 
-The repository requires JDK 17. The checked-in Gradle wrapper installs the remaining build tools.
+The repository uses `mise` to install JDK 17 and the project tools.
 
 ```sh
-./gradlew detekt allTests
-./gradlew publishToMavenLocal
+mise run test
+mise run check
 ```
 
 The local publication uses the coordinates `dev.quwac:bignumber:0.1.0-SNAPSHOT`.
