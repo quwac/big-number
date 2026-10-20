@@ -2,7 +2,7 @@
 
 plugins {
     kotlin("multiplatform") version "2.4.21"
-    id("com.android.kotlin.multiplatform.library") version "9.3.1"
+    id("com.android.kotlin.multiplatform.library") version "9.4.1"
     id("dev.detekt") version "2.0.0-alpha.6"
     `maven-publish`
 }
