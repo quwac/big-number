@@ -73,6 +73,17 @@ kotlin {
     }
 }
 
+mapOf(
+    "kotlinUpgradeYarnLock" to "kotlinUpgradePackageLock",
+    "kotlinWasmUpgradeYarnLock" to "kotlinWasmUpgradePackageLock",
+).forEach { (legacyTaskName, packageTaskName) ->
+    if (tasks.findByName(legacyTaskName) == null) {
+        tasks.register(legacyTaskName) {
+            dependsOn(packageTaskName)
+        }
+    }
+}
+
 val xcodeTestTargets = listOf(
     "iosSimulatorArm64",
     "iosX64",
