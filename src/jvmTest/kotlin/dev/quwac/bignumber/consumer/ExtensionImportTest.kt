@@ -27,6 +27,7 @@ class ExtensionImportTest {
     @Test
     fun concreteNumericOperatorsCanBeImportedFromAnotherPackageOnJvm() {
         val decimal = BigDecimal("2.5")
+        val integer = BigInteger.of(3)
 
         assertEquals(BigDecimal("6.5"), 4 + decimal)
         assertEquals(BigDecimal("1.5"), 4 - decimal)
@@ -34,5 +35,9 @@ class ExtensionImportTest {
         assertEquals(BigDecimal("1.6"), 4 / decimal)
         assertEquals(BigDecimal("1.5"), 4 % decimal)
         assertTrue(4 > decimal)
+        assertEquals(BigInteger.of(7), 4 + integer)
+        assertEquals(BigInteger.ONE, 4 % integer)
+        assertEquals(BigDecimal("3.5"), 0.5 + integer)
+        assertTrue(4 > integer)
     }
 }

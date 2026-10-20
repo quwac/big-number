@@ -75,6 +75,10 @@ Primitive conversions such as `toInt()` and `toLong()` return the low-order bits
 familiar from `java.math.BigInteger`. Exact variants such as `toIntExact()` and `toULongExact()` throw
 `ArithmeticException` on overflow.
 
+`Byte`, `Short`, `Int`, `Long`, and the unsigned integer types provide concrete overloads for `+`, `-`, `*`, `/`, `%`,
+and ordered comparison with `BigInteger` in either operand order. `Float` and `Double` provide the same operators with
+`BigInteger`, returning `BigDecimal` so fractional results are preserved.
+
 String parsing accepts an optional sign. `BigInteger` supports radices from 2 through 36. Invalid text throws
 `IllegalArgumentException`; nullable parsing functions return `null`. Division by zero and non-terminating exact decimal
 division throw `ArithmeticException`.

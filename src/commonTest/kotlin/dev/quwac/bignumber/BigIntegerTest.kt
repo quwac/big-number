@@ -60,6 +60,242 @@ class BigIntegerTest {
         assertFailsWith<ArithmeticException> { left / BigInteger.ZERO }
     }
 
+    @Suppress("LongMethod") // The complete primitive/operator matrix belongs in one test.
+    @Test
+    fun interoperatesWithConcreteIntegralTypesInBothOperandOrders() {
+        val integer = BigInteger.of(5)
+        val byteValue: Byte = 2.toByte()
+        val shortValue: Short = 2.toShort()
+        val intValue: Int = 2
+        val longValue: Long = 2L
+        val uByteValue: UByte = 2.toUByte()
+        val uShortValue: UShort = 2.toUShort()
+        val uIntValue: UInt = 2u
+        val uLongValue: ULong = 2uL
+
+        assertIntegerResults(
+            "7",
+            listOf(
+                integer + byteValue,
+                byteValue + integer,
+                integer + shortValue,
+                shortValue + integer,
+                integer + intValue,
+                intValue + integer,
+                integer + longValue,
+                longValue + integer,
+                integer + uByteValue,
+                uByteValue + integer,
+                integer + uShortValue,
+                uShortValue + integer,
+                integer + uIntValue,
+                uIntValue + integer,
+                integer + uLongValue,
+                uLongValue + integer,
+            ),
+        )
+        assertIntegerResults(
+            "3",
+            listOf(
+                integer - byteValue,
+                integer - shortValue,
+                integer - intValue,
+                integer - longValue,
+                integer - uByteValue,
+                integer - uShortValue,
+                integer - uIntValue,
+                integer - uLongValue,
+            ),
+        )
+        assertIntegerResults(
+            "-3",
+            listOf(
+                byteValue - integer,
+                shortValue - integer,
+                intValue - integer,
+                longValue - integer,
+                uByteValue - integer,
+                uShortValue - integer,
+                uIntValue - integer,
+                uLongValue - integer,
+            ),
+        )
+        assertIntegerResults(
+            "10",
+            listOf(
+                integer * byteValue,
+                byteValue * integer,
+                integer * shortValue,
+                shortValue * integer,
+                integer * intValue,
+                intValue * integer,
+                integer * longValue,
+                longValue * integer,
+                integer * uByteValue,
+                uByteValue * integer,
+                integer * uShortValue,
+                uShortValue * integer,
+                integer * uIntValue,
+                uIntValue * integer,
+                integer * uLongValue,
+                uLongValue * integer,
+            ),
+        )
+        assertIntegerResults(
+            "2",
+            listOf(
+                integer / byteValue,
+                integer / shortValue,
+                integer / intValue,
+                integer / longValue,
+                integer / uByteValue,
+                integer / uShortValue,
+                integer / uIntValue,
+                integer / uLongValue,
+            ),
+        )
+        assertIntegerResults(
+            "0",
+            listOf(
+                byteValue / integer,
+                shortValue / integer,
+                intValue / integer,
+                longValue / integer,
+                uByteValue / integer,
+                uShortValue / integer,
+                uIntValue / integer,
+                uLongValue / integer,
+            ),
+        )
+        assertIntegerResults(
+            "1",
+            listOf(
+                integer % byteValue,
+                integer % shortValue,
+                integer % intValue,
+                integer % longValue,
+                integer % uByteValue,
+                integer % uShortValue,
+                integer % uIntValue,
+                integer % uLongValue,
+            ),
+        )
+        assertIntegerResults(
+            "2",
+            listOf(
+                byteValue % integer,
+                shortValue % integer,
+                intValue % integer,
+                longValue % integer,
+                uByteValue % integer,
+                uShortValue % integer,
+                uIntValue % integer,
+                uLongValue % integer,
+            ),
+        )
+        assertTrue(
+            listOf(
+                (integer > byteValue),
+                (byteValue < integer),
+                (integer > shortValue),
+                (shortValue < integer),
+                (integer > intValue),
+                (intValue < integer),
+                (integer > longValue),
+                (longValue < integer),
+                (integer > uByteValue),
+                (uByteValue < integer),
+                (integer > uShortValue),
+                (uShortValue < integer),
+                (integer > uIntValue),
+                (uIntValue < integer),
+                (integer > uLongValue),
+                (uLongValue < integer),
+            ).all { it },
+        )
+    }
+
+    @Suppress("LongMethod") // Both floating-point types exercise every supported operator.
+    @Test
+    fun promotesFloatingPointOperandsToBigDecimal() {
+        val integer = BigInteger.of(5)
+        val floatValue = 2.0F
+        val doubleValue = 2.0
+
+        assertDecimalResults(
+            "7",
+            listOf(
+                integer + floatValue,
+                floatValue + integer,
+                integer + doubleValue,
+                doubleValue + integer,
+            ),
+        )
+        assertDecimalResults(
+            "3",
+            listOf(
+                integer - floatValue,
+                integer - doubleValue,
+            ),
+        )
+        assertDecimalResults(
+            "-3",
+            listOf(
+                floatValue - integer,
+                doubleValue - integer,
+            ),
+        )
+        assertDecimalResults(
+            "10",
+            listOf(
+                integer * floatValue,
+                floatValue * integer,
+                integer * doubleValue,
+                doubleValue * integer,
+            ),
+        )
+        assertDecimalResults(
+            "2.5",
+            listOf(
+                integer / floatValue,
+                integer / doubleValue,
+            ),
+        )
+        assertDecimalResults(
+            "0.4",
+            listOf(
+                floatValue / integer,
+                doubleValue / integer,
+            ),
+        )
+        assertDecimalResults(
+            "1",
+            listOf(
+                integer % floatValue,
+                integer % doubleValue,
+            ),
+        )
+        assertDecimalResults(
+            "2",
+            listOf(
+                floatValue % integer,
+                doubleValue % integer,
+            ),
+        )
+        assertTrue(
+            listOf(
+                (integer > floatValue),
+                (floatValue < integer),
+                (integer > doubleValue),
+                (doubleValue < integer),
+            ).all { it },
+        )
+
+        val promoted: BigDecimal = integer + 0.5
+        assertDecimalResults("5.5", listOf(promoted))
+        assertFailsWith<IllegalArgumentException> { integer + Double.POSITIVE_INFINITY }
+    }
+
     @Test
     fun handlesCarryBorrowPowersAndGreatestCommonDivisors() {
         assertEquals(
@@ -119,4 +355,14 @@ class BigIntegerTest {
         }
         assertTrue(BigInteger.parse("123456789012345678901234567890") > BigInteger.of(Long.MAX_VALUE))
     }
+}
+
+private fun assertIntegerResults(expectedText: String, actuals: List<BigInteger>) {
+    val expected = BigInteger(expectedText)
+    actuals.forEach { assertEquals(expected, it) }
+}
+
+private fun assertDecimalResults(expectedText: String, actuals: List<BigDecimal>) {
+    val expected = BigDecimal(expectedText)
+    actuals.forEach { assertEquals(0, expected.compareTo(it)) }
 }
