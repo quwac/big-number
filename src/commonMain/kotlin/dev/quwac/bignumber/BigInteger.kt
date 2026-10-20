@@ -115,6 +115,100 @@ class BigInteger private constructor(
         return first
     }
 
+    /** Returns the bitwise AND using an infinite-width two's-complement representation. */
+    infix fun and(other: BigInteger): BigInteger = bitwise(other, BitwiseOperation.AND)
+
+    /** Returns the bitwise OR using an infinite-width two's-complement representation. */
+    infix fun or(other: BigInteger): BigInteger = bitwise(other, BitwiseOperation.OR)
+
+    /** Returns the bitwise exclusive OR using an infinite-width two's-complement representation. */
+    infix fun xor(other: BigInteger): BigInteger = bitwise(other, BitwiseOperation.XOR)
+
+    /** Returns this value with every bit inverted in an infinite-width two's-complement representation. */
+    fun inv(): BigInteger = -this - ONE
+
+    /** Compatibility alias for [inv]. */
+    fun not(): BigInteger = inv()
+
+    /** Returns the bitwise AND of this value and the inverse of [other]. */
+    infix fun andNot(other: BigInteger): BigInteger = this and other.inv()
+
+    /**
+     * Returns this value shifted left by [bitCount] bits.
+     *
+     * A negative distance shifts right instead.
+     */
+    infix fun shl(bitCount: Int): BigInteger = shiftLeft(bitCount)
+
+    /**
+     * Returns this value shifted right with sign extension by [bitCount] bits.
+     *
+     * A negative distance shifts left instead.
+     */
+    infix fun shr(bitCount: Int): BigInteger = shiftRight(bitCount)
+
+    /**
+     * Returns this value shifted left by [bitCount] bits.
+     *
+     * A negative distance shifts right instead.
+     */
+    fun shiftLeft(bitCount: Int): BigInteger =
+        if (bitCount >= 0) shiftLeftPositive(bitCount.toLong()) else shiftRightPositive(-bitCount.toLong())
+
+    /**
+     * Returns this value shifted right with sign extension by [bitCount] bits.
+     *
+     * A negative distance shifts left instead.
+     */
+    fun shiftRight(bitCount: Int): BigInteger =
+        if (bitCount >= 0) shiftRightPositive(bitCount.toLong()) else shiftLeftPositive(-bitCount.toLong())
+
+    /** Returns true when the bit at non-negative [index] is set. */
+    fun testBit(index: Int): Boolean {
+        requireBitIndex(index)
+        val bits = if (signum < 0) (-this - ONE).toString(BINARY_RADIX) else toString(BINARY_RADIX)
+        val differsFromSignBit = index < bits.length && bits[bits.lastIndex - index] == '1'
+        return if (signum < 0) !differsFromSignBit else differsFromSignBit
+    }
+
+    /** Returns a value with the bit at non-negative [index] set. */
+    fun setBit(index: Int): BigInteger {
+        requireBitIndex(index)
+        return if (testBit(index)) this else this + powerOfTwo(index)
+    }
+
+    /** Returns a value with the bit at non-negative [index] cleared. */
+    fun clearBit(index: Int): BigInteger {
+        requireBitIndex(index)
+        return if (testBit(index)) this - powerOfTwo(index) else this
+    }
+
+    /** Returns a value with the bit at non-negative [index] inverted. */
+    fun flipBit(index: Int): BigInteger {
+        requireBitIndex(index)
+        val bit = powerOfTwo(index)
+        return if (testBit(index)) this - bit else this + bit
+    }
+
+    /** Returns the number of bits in the minimal two's-complement representation, excluding the sign bit. */
+    fun bitLength(): Int {
+        val value = if (signum < 0) -this - ONE else this
+        return if (value.isZero) 0 else value.toString(BINARY_RADIX).length
+    }
+
+    /** Returns the number of bits that differ from the sign bit. */
+    fun bitCount(): Int {
+        val value = if (signum < 0) -this - ONE else this
+        return if (value.isZero) 0 else value.toString(BINARY_RADIX).count { it == '1' }
+    }
+
+    /** Returns the index of the lowest set bit, or -1 when this value is zero. */
+    fun lowestSetBit(): Int = if (isZero) {
+        -1
+    } else {
+        abs().toString(BINARY_RADIX).takeLastWhile { it == '0' }.length
+    }
+
     /** Returns the smaller of this value and [other]. */
     fun min(other: BigInteger): BigInteger = if (this <= other) this else other
 
@@ -214,6 +308,48 @@ class BigInteger private constructor(
         return if (signum < 0) 0uL - result else result
     }
 
+    private fun bitwise(other: BigInteger, operation: BitwiseOperation): BigInteger {
+        val width = maxOf(bitLength(), other.bitLength()) + 1
+        val leftBits = toTwosComplement(width)
+        val rightBits = other.toTwosComplement(width)
+        val result = CharArray(width) { index ->
+            val left = leftBits[index] == '1'
+            val right = rightBits[index] == '1'
+            val bit = when (operation) {
+                BitwiseOperation.AND -> left && right
+                BitwiseOperation.OR -> left || right
+                BitwiseOperation.XOR -> left != right
+            }
+            if (bit) '1' else '0'
+        }
+        return fromTwosComplement(result.concatToString())
+    }
+
+    private fun toTwosComplement(width: Int): String {
+        val bits = abs().toString(BINARY_RADIX).padStart(width, '0')
+        return if (signum < 0) invertAndAddOne(bits) else bits
+    }
+
+    private fun shiftLeftPositive(bitCount: Long): BigInteger {
+        if (isZero || bitCount == 0L) return this
+        if (bitCount > Int.MAX_VALUE.toLong() - magnitudeBitLength()) {
+            throw ArithmeticException("BigInteger shift distance is too large")
+        }
+        return this * powerOfTwo(bitCount.toInt())
+    }
+
+    private fun shiftRightPositive(bitCount: Long): BigInteger {
+        if (isZero || bitCount == 0L) return this
+        if (bitCount >= magnitudeBitLength()) return if (signum < 0) NEGATIVE_ONE else ZERO
+
+        val divisor = powerOfTwo(bitCount.toInt())
+        if (signum > 0) return this / divisor
+        val (quotient, remainder) = abs().divideAndRemainder(divisor)
+        return if (remainder.isZero) -quotient else -(quotient + ONE)
+    }
+
+    private fun magnitudeBitLength(): Int = abs().toString(BINARY_RADIX).length
+
     private fun requireSignedRange(minimum: BigInteger, maximum: BigInteger, target: String): BigInteger {
         if (this < minimum || this > maximum) throw ArithmeticException("BigInteger out of $target range")
         return this
@@ -229,6 +365,9 @@ class BigInteger private constructor(
         val ONE: BigInteger = BigInteger(1, "1")
         val TEN: BigInteger = BigInteger(1, "10")
 
+        private val NEGATIVE_ONE: BigInteger = BigInteger(-1, "1")
+        private val TWO: BigInteger = BigInteger(1, "2")
+
         private val BYTE_MIN = decimal(Byte.MIN_VALUE.toString())
         private val BYTE_MAX = decimal(Byte.MAX_VALUE.toString())
         private val SHORT_MIN = decimal(Short.MIN_VALUE.toString())
@@ -241,6 +380,28 @@ class BigInteger private constructor(
         private val USHORT_MAX = decimal(UShort.MAX_VALUE.toString())
         private val UINT_MAX = decimal(UInt.MAX_VALUE.toString())
         private val ULONG_MAX = decimal(ULong.MAX_VALUE.toString())
+
+        private fun powerOfTwo(index: Int): BigInteger = TWO.pow(index)
+
+        private fun fromTwosComplement(bits: String): BigInteger {
+            if (bits.first() == '0') return parse(bits, BINARY_RADIX)
+            return -parse(invertAndAddOne(bits), BINARY_RADIX)
+        }
+
+        private fun invertAndAddOne(bits: String): String {
+            val result = CharArray(bits.length)
+            var carry = true
+            for (index in bits.lastIndex downTo 0) {
+                val inverted = bits[index] == '0'
+                result[index] = if (inverted != carry) '1' else '0'
+                carry = inverted && carry
+            }
+            return result.concatToString()
+        }
+
+        private fun requireBitIndex(index: Int) {
+            if (index < 0) throw ArithmeticException("Negative bit address")
+        }
 
         fun of(value: Byte): BigInteger = decimal(value.toString())
 
@@ -328,6 +489,12 @@ class BigInteger private constructor(
             return fromMagnitude(signum, digits)
         }
     }
+}
+
+private enum class BitwiseOperation {
+    AND,
+    OR,
+    XOR,
 }
 
 private fun compareMagnitude(left: String, right: String): Int {
@@ -433,6 +600,7 @@ private fun requireRadix(radix: Int) {
 
 private const val MIN_RADIX = 2
 private const val MAX_RADIX = 36
+private const val BINARY_RADIX = 2
 private const val DECIMAL_RADIX = 10
 private const val MAX_DECIMAL_DIGIT = DECIMAL_RADIX - 1
 private const val DIGITS = "0123456789abcdefghijklmnopqrstuvwxyz"
