@@ -17,16 +17,75 @@ locked = true
 
 [tasks.test]
 description = "Run tests available on the current host"
-run = "./gradlew allTests"
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "${ANDROID_HOME:-}" && -d "$HOME/Library/Android/sdk" ]]; then
+  export ANDROID_HOME="$HOME/Library/Android/sdk"
+fi
+
+./gradlew allTests
+'''
 
 [tasks.check]
 description = "Run security checks, static analysis, tests, and local publication verification"
-run = [
-    "mise run security",
-    "./gradlew detekt",
-    "./gradlew allTests",
-    "./gradlew publishToMavenLocal",
-]
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "${ANDROID_HOME:-}" && -d "$HOME/Library/Android/sdk" ]]; then
+  export ANDROID_HOME="$HOME/Library/Android/sdk"
+fi
+
+mise run security
+./gradlew detekt
+./gradlew allTests
+./gradlew publishToMavenLocal --no-configuration-cache
+'''
+
+[tasks.release]
+description = "Verify main, create a release tag, and push it"
+usage = 'arg "<version>" help="Release version in v1.0.0 or 1.0.0 format"'
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+
+version="${usage_version#v}"
+if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "Expected version in v1.0.0 or 1.0.0 format" >&2
+  exit 1
+fi
+tag="v$version"
+
+if [[ "$(git branch --show-current)" != "main" ]]; then
+  echo "Release tags must be created from main" >&2
+  exit 1
+fi
+if [[ -n "$(git status --porcelain)" ]]; then
+  echo "The worktree must be clean" >&2
+  exit 1
+fi
+
+git fetch origin main --tags
+if [[ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]]; then
+  echo "Local main must match origin/main" >&2
+  exit 1
+fi
+if git rev-parse --quiet --verify "refs/tags/$tag" >/dev/null; then
+  echo "Tag already exists: $tag" >&2
+  exit 1
+fi
+
+mise run check
+if [[ -n "$(git status --porcelain)" ]]; then
+  echo "Verification changed the worktree" >&2
+  exit 1
+fi
+
+git tag --annotate "$tag" --message "$tag"
+git push origin "$tag"
+'''
 
 [tasks.security]
 description = "Scan secrets and validate GitHub Actions"
