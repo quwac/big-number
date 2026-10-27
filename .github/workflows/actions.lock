@@ -6,12 +6,12 @@ workflows:
     '.github/workflows/ci.yml':
         - 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1'
         - 'gradle/actions@3f5f9adaf7d9fecd50b5935e54106014257a94e6'
-        - 'jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8'
+        - 'jdx/mise-action@fc42bcc7ddbf51124c30f95a877a0c5168a3bfde'
     '.github/workflows/codeql.yml':
         - 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1'
         - 'github/codeql-action@24c54180a607b1449ed407dd24f251e4e9147c8d'
         - 'gradle/actions@3f5f9adaf7d9fecd50b5935e54106014257a94e6'
-        - 'jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8'
+        - 'jdx/mise-action@fc42bcc7ddbf51124c30f95a877a0c5168a3bfde'
 dependencies:
     'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1':
         ref: 'v7.0.1'
@@ -28,8 +28,8 @@ dependencies:
         commit: 'sha1-3f5f9adaf7d9fecd50b5935e54106014257a94e6'
         owner_id: 124156
         repo_id: 743626948
-    'jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8':
-        ref: 'v5.1.2'
-        commit: 'sha1-08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8'
+    'jdx/mise-action@fc42bcc7ddbf51124c30f95a877a0c5168a3bfde':
+        ref: 'v5.2.1'
+        commit: 'sha1-fc42bcc7ddbf51124c30f95a877a0c5168a3bfde'
         owner_id: 216188
         repo_id: 738284564
