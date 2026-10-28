@@ -2,5 +2,5 @@
 version: 3
 
 min_age:
-  value: 7
+  value: 3
   always: true
