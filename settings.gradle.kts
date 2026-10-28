@@ -7,6 +7,7 @@ pluginManagement {
 }
 
 val secureTransitiveDependencies = listOf(
+    "com.google.guava:guava:33.7.2-jre",
     "io.opentelemetry:opentelemetry-api:1.67.0",
     "io.opentelemetry:opentelemetry-context:1.67.0",
     "org.apache.commons:commons-lang3:3.18.0",
