@@ -2,28 +2,7 @@
   <title id="title">BigNumber logo</title>
   <desc id="desc">The word Big in a blue, violet, pink, and orange gradient above the word Number in dark navy.</desc>
   <defs>
-    <linearGradient id="b-gradient" x1="-272.0" y1="256.15" x2="349.33" y2="-328.97" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#009bfc"/>
-      <stop offset=".28" stop-color="#0749fa"/>
-      <stop offset=".52" stop-color="#6023fd"/>
-      <stop offset=".74" stop-color="#ee22cf"/>
-      <stop offset="1" stop-color="#ff760e"/>
-    </linearGradient>
     <linearGradient id="dot-gradient" x1="-10.73" y1="8.73" x2="548.49" y2="-446.19" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#009bfc"/>
-      <stop offset=".28" stop-color="#0749fa"/>
-      <stop offset=".52" stop-color="#6023fd"/>
-      <stop offset=".74" stop-color="#ee22cf"/>
-      <stop offset="1" stop-color="#ff760e"/>
-    </linearGradient>
-    <linearGradient id="stem-gradient" x1="179.22" y1="-74.6" x2="850.0" y2="-353.81" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#009bfc"/>
-      <stop offset=".28" stop-color="#0749fa"/>
-      <stop offset=".52" stop-color="#6023fd"/>
-      <stop offset=".74" stop-color="#ee22cf"/>
-      <stop offset="1" stop-color="#ff760e"/>
-    </linearGradient>
-    <linearGradient id="g-gradient" x1="-3.55" y1="2.79" x2="696.53" y2="-547.86" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#009bfc"/>
       <stop offset=".28" stop-color="#0749fa"/>
       <stop offset=".52" stop-color="#6023fd"/>
