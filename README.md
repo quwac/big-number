@@ -1,3 +1,5 @@
+<!-- rumdl-disable MD041 -->
+
 <p align="center">
   <img src="docs/assets/bignumber-logo.svg" alt="BigNumber logo" width="420">
 </p>

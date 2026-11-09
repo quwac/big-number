@@ -11,6 +11,16 @@ Use the checked-in Gradle wrapper for all build operations.
 
 ## Verification
 
+Markdown checks use the rumdl version pinned in `mise.toml` and `mise.lock`:
+
+```sh
+mise trust
+mise install --locked rumdl
+mise run markdown
+```
+
+CI runs the same Markdown check on every pull request, including documentation-only changes.
+
 ```sh
 ./gradlew detekt
 ./gradlew allTests
