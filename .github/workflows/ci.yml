@@ -13,6 +13,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  markdown:
+    runs-on: ubuntu-latest
+    env:
+      MISE_TASK_RUN_AUTO_INSTALL: 'false'
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5.2.4
+        with:
+          version: '2026.8.11'
+          sha256: 3d825b8341925abb398fba6fd8dcd7d6e92ade6820d892da62992e0765638e66
+          install_args: --locked rumdl
+          cache: true
+      - run: mise run markdown
+
   changes:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -134,12 +151,13 @@ jobs:
 
   test:
     if: ${{ always() }}
-    needs: [changes, quality, linux-tests, apple-tests, windows-tests]
+    needs: [markdown, changes, quality, linux-tests, apple-tests, windows-tests]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Require successful verification jobs
         run: |
+          test "${{ needs.markdown.result }}" = success
           test "${{ needs.changes.result }}" = success
           test "${{ needs.quality.result }}" = success || test "${{ needs.quality.result }}" = skipped
           test "${{ needs.linux-tests.result }}" = success || test "${{ needs.linux-tests.result }}" = skipped

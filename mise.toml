@@ -2,6 +2,7 @@
 jactionlint = "github:jdx/jactionlint"
 
 [tools]
+rumdl = "0.3.2"
 betterleaks = "1.9.0"
 jactionlint = "2.1.0"
 java = "temurin-17.0.20+101"
@@ -29,7 +30,7 @@ fi
 '''
 
 [tasks.check]
-description = "Run security checks, static analysis, tests, and local publication verification"
+description = "Run Markdown, security checks, static analysis, tests, and local publication verification"
 run = '''
 #!/usr/bin/env bash
 set -euo pipefail
@@ -38,6 +39,7 @@ if [[ -z "${ANDROID_HOME:-}" && -d "$HOME/Library/Android/sdk" ]]; then
   export ANDROID_HOME="$HOME/Library/Android/sdk"
 fi
 
+mise run markdown
 mise run security
 ./gradlew detekt
 ./gradlew allTests
@@ -89,3 +91,7 @@ run = [
     "jactionlint",
     "zizmor --offline --no-progress --color never .",
 ]
+
+[tasks.markdown]
+description = "Check Markdown with rumdl"
+run = "rumdl check --config .rumdl.toml ."
