@@ -2,6 +2,7 @@ config:
   validation: true
 
 comments:
+  active: true
   UndocumentedPublicClass:
     active: true
   UndocumentedPublicFunction:
@@ -12,6 +13,10 @@ comments:
 ktlint:
   active: true
   code_style: intellij_idea
+  Kdoc:
+    active: true
+  KdocWrapping:
+    active: true
 
 # Let ktlint own overlapping rules so automatic correction is available.
 empty-blocks:
