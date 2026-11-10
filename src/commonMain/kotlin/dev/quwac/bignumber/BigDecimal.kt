@@ -11,6 +11,7 @@ import kotlin.math.max
  * have different scales. [equals] requires both the value and scale to match, while [compareTo]
  * compares numerical values.
  *
+ * @constructor Creates a decimal equal to `unscaledValue * 10^(-scale)` without rounding.
  * @property unscaledValue The integer obtained by removing this value's decimal point.
  * @property scale The number of digits to the right of the decimal point. A negative value places
  * the decimal point to the right of the unscaled value.
@@ -55,7 +56,7 @@ class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<Big
     /** Returns the additive inverse of this value, preserving scale. */
     operator fun unaryMinus(): BigDecimal = if (isZero) this else of(-unscaledValue, scale)
 
-    /** Returns the sum of this value and [other]. */
+    /** Returns the exact sum with the larger of the two operand scales. */
     operator fun plus(other: BigDecimal): BigDecimal {
         val resultScale = maxOf(scale, other.scale)
         val left = unscaledValue.timesPowerOfTen(scaleDifference(resultScale, scale))
@@ -66,13 +67,17 @@ class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<Big
     /** Adds [other] and rounds the exact result according to [mathContext]. */
     fun plus(other: BigDecimal, mathContext: MathContext): BigDecimal = (this + other).round(mathContext)
 
-    /** Returns this value minus [other]. */
+    /** Returns the exact difference with the larger of the two operand scales. */
     operator fun minus(other: BigDecimal): BigDecimal = this + -other
 
     /** Subtracts [other] and rounds the exact result according to [mathContext]. */
     fun minus(other: BigDecimal, mathContext: MathContext): BigDecimal = (this - other).round(mathContext)
 
-    /** Returns the product of this value and [other]. */
+    /**
+     * Returns the exact product with the sum of the two operand scales.
+     *
+     * @throws ArithmeticException when the result scale is outside the [Int] range.
+     */
     operator fun times(other: BigDecimal): BigDecimal =
         of(unscaledValue * other.unscaledValue, checkedScale(scale.toLong() + other.scale.toLong()))
 
@@ -181,7 +186,11 @@ class BigDecimal(val unscaledValue: BigInteger, val scale: Int) : Comparable<Big
         return divide(other, targetScale, mathContext.roundingMode).round(mathContext)
     }
 
-    /** Returns the remainder after division toward zero. */
+    /**
+     * Returns the remainder after division toward zero, as in [remainder].
+     *
+     * @throws ArithmeticException when [other] is zero or an intermediate scale is out of range.
+     */
     operator fun rem(other: BigDecimal): BigDecimal = remainder(other)
 
     /**
