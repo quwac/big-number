@@ -14,7 +14,7 @@ val secureTransitiveDependencies = listOf(
     "org.apache.httpcomponents:httpclient:4.5.14",
     "org.apache.httpcomponents:httpmime:4.5.14",
     "org.bitbucket.b_c:jose4j:0.9.7",
-    "org.bouncycastle:bcpkix-jdk18on:1.86",
+    "org.bouncycastle:bcpkix-jdk18on:1.87",
     "org.bouncycastle:bcprov-jdk18on:1.86",
     "org.bouncycastle:bcutil-jdk18on:1.86",
     "org.jdom:jdom2:2.0.6.1",
