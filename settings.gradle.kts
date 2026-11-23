@@ -10,7 +10,7 @@ val secureTransitiveDependencies = listOf(
     "com.google.guava:guava:33.8.0-jre",
     "io.opentelemetry:opentelemetry-api:1.68.0",
     "io.opentelemetry:opentelemetry-context:1.68.0",
-    "org.apache.commons:commons-lang3:3.21.0",
+    "org.apache.commons:commons-lang3:3.22.0",
     "org.apache.httpcomponents:httpclient:4.5.14",
     "org.apache.httpcomponents:httpmime:4.5.14",
     "org.bitbucket.b_c:jose4j:0.9.7",
