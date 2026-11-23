@@ -29,6 +29,9 @@ rootProject.extensions.configure<org.jetbrains.kotlin.gradle.targets.js.npm.NpmE
     override("body-parser", "1.20.9")
     override("diff", "8.0.3")
     override("fast-uri", "3.1.9")
+    override("follow-redirects", "1.16.3")
+    override("glob@^10.0.0", "14.0.2")
+    override("minimatch@^9.0.0", "11.0.9")
     override("serialize-javascript", "7.1.3")
 }
 nodeJsRoot.versions.webpack.version = "5.112.0"
